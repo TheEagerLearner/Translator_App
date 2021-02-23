@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:background="#ffffff">
+
+    <Button
+        android:layout_below="@+id/txtConverted"
+        android:id="@+id/btnStart"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/ic_rec"
+        android:text="Start"
+        android:textSize="50sp"
+        android:fontFamily="casual"
+        />
+
+    <Spinner
+        android:id="@+id/spinFrom"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:tooltipText="Language"
+        />
+
+    <TextView
+        android:fontFamily="casual"
+        android:layout_below="@+id/spinFrom"
+        android:id="@+id/txtConverted"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Convert\nTo"
+        android:textSize="20sp"
+        android:textAlignment="center"
+        android:layout_marginTop="50dp"
+        android:textColor="#1e212d"
+        android:layout_centerHorizontal="true"
+        />
+
+    <Spinner
+        android:layout_below="@+id/txtConverted"
+        android:id="@+id/spinTo"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:tooltipText="Language"
+        />
+
+
+</RelativeLayout>
