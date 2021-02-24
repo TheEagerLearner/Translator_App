@@ -53,7 +53,7 @@ public class FloatingWindow extends Service {
         params.y = 0;
 
         final ImageView open = new ImageView(this);
-        open.setImageResource(R.drawable.ic_on);
+        open.setImageResource(R.drawable.ic_onagain);
         ViewGroup.LayoutParams btnparam = new ViewGroup.LayoutParams(
                 150,150);
         open.setLayoutParams(btnparam);
@@ -104,11 +104,11 @@ public class FloatingWindow extends Service {
 
                 if(i%2!=0)
                 {
-                    open.setImageResource(R.drawable.ic_off);
+                    open.setImageResource(R.drawable.ic_offagain);
                 }
                 else
                 {
-                    open.setImageResource(R.drawable.ic_on);
+                    open.setImageResource(R.drawable.ic_onagain);
                 }
                 i=i+1;
 
