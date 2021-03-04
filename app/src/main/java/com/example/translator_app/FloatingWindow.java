@@ -3,9 +3,15 @@ package com.example.translator_app;
 
 import android.app.Service;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
+import android.os.Bundle;
 import android.os.IBinder;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.speech.tts.TextToSpeech;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -14,14 +20,25 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Locale;
 
 public class FloatingWindow extends Service {
 
     WindowManager wm;
     LinearLayout ll;
     int i=1;
+    SpeechRecognizer speechRecognizer;
+    Intent speechIntent;
+    String text="";
+
+    TextToSpeech textToSpeech;
+
+    SharedPreferences sharedPreferences;
 
     @Nullable
     @Override
@@ -32,6 +49,8 @@ public class FloatingWindow extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        sharedPreferences=getSharedPreferences("Translator",MODE_PRIVATE);
 
 
         wm = (WindowManager) getSystemService(WINDOW_SERVICE);
@@ -60,6 +79,104 @@ public class FloatingWindow extends Service {
 
         ll.addView(open);
         wm.addView(ll,params);
+
+        //Setting the language here
+        String from=sharedPreferences.getString("from","en");
+        String to=sharedPreferences.getString("to","en");
+
+        String langOut=to;                                             //here for now i have set the language as the String variable to
+        String langIn=from;
+        final Locale locOut=new Locale(langOut);     //Output Langauge do not change
+        final Locale locIn=new Locale(langOut);     //Change langOut to LangIn her form input language
+
+
+
+        //SpeechToText is done over here
+        speechRecognizer=SpeechRecognizer.createSpeechRecognizer(this);
+        speechIntent=new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        speechIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, locOut.getLanguage());
+
+        speechRecognizer.setRecognitionListener(new RecognitionListener() {
+            @Override
+            public void onReadyForSpeech(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onBeginningOfSpeech() {
+
+            }
+
+            @Override
+            public void onRmsChanged(float v) {
+
+            }
+
+            @Override
+            public void onBufferReceived(byte[] bytes) {
+
+            }
+
+            @Override
+            public void onEndOfSpeech() {
+
+            }
+
+            @Override
+            public void onError(int i) {
+
+            }
+
+            @Override
+            public void onResults(Bundle bundle) {
+
+                ArrayList<String> data=bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                if(data!=null)
+                {
+                    text=data.get(0);
+                    speak(text);
+                    Toast.makeText(FloatingWindow.this,text,Toast.LENGTH_LONG).show();
+                    //txtSpoken.setText(text);
+                }
+
+            }
+
+            @Override
+            public void onPartialResults(Bundle bundle) {
+
+            }
+
+            @Override
+            public void onEvent(int i, Bundle bundle) {
+
+            }
+        });
+
+        //TextToSpeech is Done Over here
+
+        textToSpeech=new TextToSpeech(FloatingWindow.this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int i) {
+                if(i==TextToSpeech.SUCCESS)
+                {
+                    int result=textToSpeech.setLanguage(Locale.forLanguageTag(locIn.getLanguage()));
+
+                    if(result==TextToSpeech.LANG_MISSING_DATA || result==TextToSpeech.LANG_NOT_SUPPORTED)
+                    {
+                        Toast.makeText(FloatingWindow.this,"Language Not Supported",Toast.LENGTH_LONG).show();
+                    }
+
+                }
+                else
+                {
+                    Toast.makeText(FloatingWindow.this,"Initialization Failed",Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+
+
 
         open.setOnTouchListener(new View.OnTouchListener() {
             WindowManager.LayoutParams updatepar = params;
@@ -91,6 +208,7 @@ public class FloatingWindow extends Service {
 
                     default:
                         break;
+
                 }
 
                 return false;
@@ -105,10 +223,14 @@ public class FloatingWindow extends Service {
                 if(i%2!=0)
                 {
                     open.setImageResource(R.drawable.ic_offagain);
+                    speechRecognizer.startListening(speechIntent);
+
                 }
                 else
                 {
                     open.setImageResource(R.drawable.ic_onagain);
+                    speechRecognizer.stopListening();
+                    text="";
                 }
                 i=i+1;
 
@@ -118,11 +240,22 @@ public class FloatingWindow extends Service {
 
 
     }
+    private void speak(String t)
+    {
+        //take the input t which is input text from here
+        String val=t;  //change t to the spi outputed text/python code
+        textToSpeech.speak(val,TextToSpeech.QUEUE_FLUSH,null);
+
+
+    }
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         stopSelf();
         wm.removeView(ll);
+        textToSpeech.stop();
+        textToSpeech.shutdown();
     }
 }

@@ -4,11 +4,16 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,10 +37,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     boolean start=false;
     private static final int CODE_DRAW_OVER_OTHER_APP_PERMISSION = 2084;
 
+    SharedPreferences sharedPreferences;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sharedPreferences=getSharedPreferences("Translator",MODE_PRIVATE);
+
+        getSupportActionBar().hide();
+
+
+        //Audio Record permission dialog box
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.RECORD_AUDIO},1);
+        }
 
         btnStart=findViewById(R.id.btnStart);
         spinFrom=findViewById(R.id.spinFrom);
@@ -69,6 +86,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
                }
                 start_stop();
+
 
             }
         });
@@ -148,10 +166,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
 
     }
-
-
-
-
     private boolean isMyServiceRunning(Class<?> serviceClass) {
         ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
@@ -170,17 +184,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-        String txt =adapterView.getItemAtPosition(i).toString();
+        int txt =adapterView.getSelectedItemPosition();
         if(adapterView.getId()==R.id.spinFrom)
         {
-            String from=txt;
+            String from=Code(txt);
             arr[0]=from;
+            sharedPreferences.edit().putString("from",from).apply();
 
         }
         else
         {
-            String to=txt;
-            arr[1]=txt;
+            String to=Code(txt);
+            arr[1]=to;
+            sharedPreferences.edit().putString("to",to).apply();
         }
 
     }
@@ -189,4 +205,27 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void onNothingSelected(AdapterView<?> adapterView) {
 
     }
+
+
+public String Code(int code)
+{
+    if(code==0)
+    {
+        return "en";
+    }
+    if(code==1)
+    {
+        return "fr";
+    }
+    if(code==2)
+    {
+        return "de";
+    }
+    if(code==3)
+    {
+        return "hi-IN";
+    }
+
+    return "";
+}
 }
