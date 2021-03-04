@@ -58,11 +58,14 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         spinFrom=findViewById(R.id.spinFrom);
         spinTo=findViewById(R.id.spinTo);
 
+
+        //Spinner1
         ArrayAdapter<CharSequence> adp=ArrayAdapter.createFromResource(this,R.array.languages,android.R.layout.simple_spinner_item);
         adp.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinTo.setAdapter(adp);
         spinTo.setOnItemSelectedListener(this);
 
+        //Spinner2
         ArrayAdapter<CharSequence> adpt=ArrayAdapter.createFromResource(this,R.array.languages,android.R.layout.simple_spinner_item);
         adpt.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinFrom.setAdapter(adpt);
@@ -207,7 +210,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
 
-public String Code(int code)
+
+
+public String Code(int code)                       //This method return the specific code associated to that language
 {
     if(code==0)
     {
