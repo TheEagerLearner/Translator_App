@@ -24,6 +24,9 @@ import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
+import com.chaquo.python.PyObject;
+import com.chaquo.python.Python;
+
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -35,6 +38,9 @@ public class FloatingWindow extends Service {
     SpeechRecognizer speechRecognizer;
     Intent speechIntent;
     String text="";
+    String translated_text="";
+    Python py = Python.getInstance();
+    final PyObject pythonObj = py.getModule("translate");
 
     TextToSpeech textToSpeech;
 
@@ -84,8 +90,8 @@ public class FloatingWindow extends Service {
         String from=sharedPreferences.getString("from","en");
         String to=sharedPreferences.getString("to","en");
 
-        String langOut=to;                                             //here for now i have set the language as the String variable to
-        String langIn=from;
+        final String langOut=to;                                             //here for now i have set the language as the String variable to
+        final String langIn=from;
         final Locale locOut=new Locale(langOut);     //Output Langauge do not change
         final Locale locIn=new Locale(langOut);     //Change langOut to LangIn her form input language
 
@@ -135,7 +141,9 @@ public class FloatingWindow extends Service {
                 if(data!=null)
                 {
                     text=data.get(0);
-                    speak(text);
+                    PyObject obj = pythonObj.callAttr("translate",text , langIn, langOut);
+                    translated_text = obj.toString();
+                    speak(translated_text);
                     Toast.makeText(FloatingWindow.this,text,Toast.LENGTH_LONG).show();
                     //txtSpoken.setText(text);
                 }

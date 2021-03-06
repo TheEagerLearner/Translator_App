@@ -228,7 +228,7 @@ public String Code(int code)                       //This method return the spec
     }
     if(code==3)
     {
-        return "hi-IN";
+        return "hi";
     }
 
     return "";
