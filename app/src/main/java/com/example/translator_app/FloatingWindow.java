@@ -144,7 +144,7 @@ public class FloatingWindow extends Service {
                     PyObject obj = pythonObj.callAttr("translate",text , langIn, langOut);
                     translated_text = obj.toString();
                     speak(translated_text);
-                    Toast.makeText(FloatingWindow.this,text,Toast.LENGTH_LONG).show();
+                    Toast.makeText(FloatingWindow.this,translated_text,Toast.LENGTH_LONG).show();
                     //txtSpoken.setText(text);
                 }
 
