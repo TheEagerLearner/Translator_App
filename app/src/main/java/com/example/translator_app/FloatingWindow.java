@@ -12,6 +12,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -28,7 +29,9 @@ import com.chaquo.python.PyObject;
 import com.chaquo.python.Python;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 public class FloatingWindow extends Service {
 
@@ -39,6 +42,7 @@ public class FloatingWindow extends Service {
     Intent speechIntent;
     String text="";
     String translated_text="";
+
     Python py = Python.getInstance();
     final PyObject pythonObj = py.getModule("translate");
 
@@ -78,7 +82,7 @@ public class FloatingWindow extends Service {
         params.y = 0;
 
         final ImageView open = new ImageView(this);
-        open.setImageResource(R.drawable.ic_onagain);
+        open.setImageResource(R.drawable.ic_translateon);
         ViewGroup.LayoutParams btnparam = new ViewGroup.LayoutParams(
                 150,150);
         open.setLayoutParams(btnparam);
@@ -90,7 +94,7 @@ public class FloatingWindow extends Service {
         String from=sharedPreferences.getString("from","en");
         String to=sharedPreferences.getString("to","en");
 
-        final String langOut=to;                                             //here for now i have set the language as the String variable to
+        final  String langOut=to;                                             //here for now i have set the language as the String variable to
         final String langIn=from;
         final Locale locOut=new Locale(langOut);     //Output Langauge do not change
         final Locale locIn=new Locale(langOut);     //Change langOut to LangIn her form input language
@@ -126,12 +130,16 @@ public class FloatingWindow extends Service {
 
             @Override
             public void onEndOfSpeech() {
+                open.setImageResource(R.drawable.ic_translateon);
+                i=i+1;
 
             }
 
             @Override
             public void onError(int i) {
-
+                Toast.makeText(FloatingWindow.this,"Error in recognizing.\nPlease Try again",Toast.LENGTH_SHORT).show();
+                open.setImageResource(R.drawable.ic_translateon);
+                i=i+1;
             }
 
             @Override
@@ -159,7 +167,9 @@ public class FloatingWindow extends Service {
             public void onEvent(int i, Bundle bundle) {
 
             }
-        });
+
+        }
+        );
 
         //TextToSpeech is Done Over here
 
@@ -230,13 +240,13 @@ public class FloatingWindow extends Service {
 
                 if(i%2!=0)
                 {
-                    open.setImageResource(R.drawable.ic_offagain);
+                    open.setImageResource(R.drawable.ic_translateoff);
                     speechRecognizer.startListening(speechIntent);
 
                 }
                 else
                 {
-                    open.setImageResource(R.drawable.ic_onagain);
+                    open.setImageResource(R.drawable.ic_translateon);
                     speechRecognizer.stopListening();
                     text="";
                 }
@@ -254,6 +264,28 @@ public class FloatingWindow extends Service {
         String val=t;  //change t to the spi outputed text/python code
         textToSpeech.speak(val,TextToSpeech.QUEUE_FLUSH,null);
 
+/**        int gender=sharedPreferences.getInt("Gender",1);
+        if(gender==1)
+        {
+          //Female Voice
+            Set<String> a=new HashSet<>();
+            a.add("female");
+            Voice v=new Voice("en-us-x-sfg#female_2-local",new Locale(langOut),400,200,true,a);
+            textToSpeech.setVoice(v);
+            textToSpeech.setSpeechRate(0.8f);
+
+        }
+        else
+        {   //Male voice
+            Set<String> a=new HashSet<>();
+            a.add("male");                          //here you can give male if you want to select male voice.
+            Voice v=new Voice("en-us-x-sfg#male_2-local",new Locale(langOut),400,200,true,a);
+            textToSpeech.setVoice(v);
+            textToSpeech.setSpeechRate(0.8f);
+            textToSpeech.speak(val,TextToSpeech.QUEUE_FLUSH,null);
+        }
+
+     **/
 
     }
 

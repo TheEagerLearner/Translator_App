@@ -33,7 +33,7 @@ public class Launcher extends AppCompatActivity {
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i=new Intent(Launcher.this,MainActivity.class);
+                Intent i=new Intent(Launcher.this,MainActivity2.class);
                 startActivity(i);
                 finish();
             }
